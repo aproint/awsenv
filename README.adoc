@@ -84,7 +84,7 @@ If you're not using Oh My ZSH, you can source the hook script after the `awsenv.
 +
 [source]
 ----
-source ${HOME}/.awsenv/zsh-awsenv.sh
+source ${HOME}/.awsenv/zsh-awsenv.zsh
 ----
 . Reopen your terminal
 
