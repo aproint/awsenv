@@ -106,6 +106,7 @@ _awsenv_execute() {
     export AWSENV_ACTIVE=1
   else
     if [ ! -z "${AWSENV_ACTIVE}" ]; then
+      _awsenv_unset_aws
       _awsenv_load_vars
       _awsenv_unset_previous
       unset AWSENV_ACTIVE

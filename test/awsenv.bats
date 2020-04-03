@@ -78,6 +78,18 @@ harness_dir="${BATS_TEST_DIRNAME}/harness"
 }
 
 @test "execute .awsenv file" {
+  cd "${harness_dir}/1"
+  _awsenv_execute
+  [ "$AWSENV_ACTIVE" -eq 1 ]
+  [ "$AWS_PROFILE" = "1" ]
+  cd "${harness_dir}"
+  _awsenv_execute
+  [ -z "$AWSENV_ACTIVE" ]
+  [ -z "$AWS_PROFILE" ]
+  [ -z "$AWSENV_PREV_AWS_PROFILE" ]
+}
+
+@test "execute .awsenv file with a pre-existing AWS_PROFILE" {
   AWS_PROFILE="test"
   cd "${harness_dir}/1"
   _awsenv_execute
