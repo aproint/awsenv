@@ -50,7 +50,7 @@ git clone https://github.com/aproint/awsenv.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custo
 +
 [source]
 ----
-plugins=( [plugins...] zsh-awsenv)
+plugins=( [plugins...] awsenv)
 ----
 . Reopen your terminal
 +
