@@ -1,0 +1,117 @@
+= .awsenv
+Zdenek Farana <zdenek.farana@aproint.com>
+:toc: macro
+////
+We use Asciidoc because it's richer and better standardized than Markdown.
+See quick reference at https://asciidoctor.org/docs/asciidoc-syntax-quick-reference/.
+If you update the document, write one sentence per line.
+////
+
+[.lead]
+Trouble remembering the right AWS profile or region in specific projects?
+`.awsenv` comes to the rescue.
+Every time you switch to a directory with `.awsenv` file, its AWS environment variables load automatically.
+Profit.
+
+toc::[]
+
+== Motivation
+When you work with multiple AWS accounts, you'll find yourself juggling with various AWS profiles.
+You'd use `AWS_PROFILE` environment variable to switch the profile or you'd use `--profile` argument in AWS CLI commands.
+
+_It's super easy to forget to switch the profile._
+
+The common case is you're using a single profile in particular directories.
+Having a file which defines the profile and other AWS environment variables together with a mechanism how to auto-load them gives you a better control over the access to AWS.
+
+The file itself is pretty simple:
+
+..awsenv
+[source]
+----
+# You can use comments
+AWS_PROFILE=myprofile
+----
+
+We support the variables defined in the official AWS documentation https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html[Environment Variables To Configure the AWS CLI^].
+
+== Installation
+`.awsenv` is almost POSIX-compliant and it should work in the most of the major contemporary shells.
+It was tested in `zsh` and `bash`.
+
+=== Oh My ZSH
+. Clone this repository into `~/.oh-my-zsh/custom/plugins` directory:
++
+[source,bash]
+----
+git clone https://github.com/aproint/awsenv.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/awsenv
+----
+. Activate the plugin in `~/.zshrc`:
++
+[source]
+----
+plugins=( [plugins...] zsh-awsenv)
+----
+. Reopen your terminal
++
+NOTE: This installation enables the hook automatically
+
+=== Other Shells
+. Clone this repository into `~/.awsenv` directory.
++
+[source,bash]
+----
+git clone https://github.com/aproint/awsenv.git ${HOME}/.awsenv
+----
+. Source the script in your shell profile, i.e. `~/.bash_profile`, `~/.zshrc`, `~/.profile`, or `~/.bashrc`:
++
+[source]
+----
+source ${HOME}/.awsenv/awsenv.sh
+----
++
+- *Bash* change directory hook
++
+Source the hook script after the `awsenv.sh` script in the shell profile:
++
+[source]
+----
+source ${HOME}/.awsenv/bash-awsenv.sh
+----
+- *ZSH* change directory hook
++
+If you're not using Oh My ZSH, you can source the hook script after the `awsenv.sh` script in the shell profile manually:
++
+[source]
+----
+source ${HOME}/.awsenv/zsh-awsenv.sh
+----
+. Reopen your terminal
+
+== Usage
+The script defines two commands `awsenv` and `awsenvclr`.
+
+. `awsenv` - execute in a directory with `.awsenv` file to load its AWS environment variables
+. `awsenvclr` - unsets all AWS environment variables; this is a convenience command when you feel your env variables got mixed up.
+
+=== Auto-load when changing directory
+Thanks to the deeper shell integration with a hook script, it's possible to execute `awsenv` on every directory change automatically and thus switch your AWS environment variables seamlessly.
+See the installation details.
+
+IMPORTANT: The hooks work only in interactive shell sessions.
+
+=== How does `awsenv` command work?
+. It searches for a `.awsenv` file in the current directory; if it can't find the file, it looks a level up in the directory hierarchy recursively until it's found (or not).
+. If `awsenv` is not active, it stores the current AWS environment variables into `AWSENV_PREV_` equivalents (aka history).
+. It sources the `.awsenv` file into your current shell session.
++
+IMPORTANT: `awsenv` filters out anything but `AWS_` prefixed environment variables.
+. When you change to a directory
++
+- without `.awsenv` file in its parent hierarchy, it loads your previous AWS environment variables from `AWSENV_PREV_` and clears the history.
++
+- with another `.awsenv` file, it loads the new AWS environment variables, but it doesn't overwrite the history.
+
+== Development
+- PRs are welcomed.
+- Tests written with https://github.com/bats-core/bats-core[bats^].
