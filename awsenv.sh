@@ -102,8 +102,10 @@ _awsenv_execute() {
     if [ -z "${AWSENV_ACTIVE}" ]; then
       _awsenv_save_vars
     fi
+    set -o allexport 
     source <(cat "$awsenv_path" | grep "^AWS_")
-    export AWSENV_ACTIVE=1
+    AWSENV_ACTIVE=1
+    set +o allexport
   else
     if [ ! -z "${AWSENV_ACTIVE}" ]; then
       _awsenv_unset_aws
